@@ -23,7 +23,7 @@ pub mod pallet {
 
 
 	#[pallet::event]
-	Self::deposit_event(Event::<T>::Created { owner });
+	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		Created { owner: T::AccountId },
 	}
