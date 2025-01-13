@@ -1,7 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod impls;
-mod tests;
 
 use frame::prelude::*;
 pub use pallet::*;
@@ -19,8 +18,10 @@ pub mod pallet {
 	}
 
 	#[pallet::storage]
-	pub(super) type CountForKitties<T: Config> = StorageValue< Value= u32>;
+	pub(super) type CountForKitties<T: Config> = StorageValue<Value = u32, QueryKind = ValueQuery>;
 
+	#[pallet::storage]
+	pub(super) type Kitties<T: Config> = StorageMap<Key = [u8; 32], Value = ()>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -29,13 +30,19 @@ pub mod pallet {
 	}
 
 	#[pallet::error]
-	pub enum Error<T> {}
+	pub enum Error<T> {
+		TooManyKitties,
+		DuplicateKitty,
+	}
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		pub fn create_kitty(origin: OriginFor<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
-			Self::mint(who)?;
+			let default_id = [0u8; 32];
+
+			
+			Self::mint(who, default_id)?;
 			Ok(())
 		}
 	}
